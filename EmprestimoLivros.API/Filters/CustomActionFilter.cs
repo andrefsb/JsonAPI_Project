@@ -16,11 +16,15 @@ namespace EmployeesRelation.API.Filters
             if (datasaved[0].EmployeeId==0)
             {
                 datasaved.Clear();
-                datasaved.Add(log);
+                datasaved.Add(log);  
+            }
+            else if (log.EmployeeId!=0)
+            {
+                datasaved.Add(log);  
             }
             else
             {
-                datasaved.Add(log);
+
             }
             JsonOperations.SaveLog(datasaved);
             log.Write();   
