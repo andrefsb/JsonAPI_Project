@@ -22,6 +22,12 @@ namespace EmployeesRelation.API.Models
 
         [JsonPropertyName("salary")]
         public double Salary { get; set; }
+
+
+        public override string ToString()
+        {
+            return $"Id:{Id} - Full Name: {FirstName} {LastName} - Gender: {Gender} - Job Title: {JobTitle} - ${Salary}";
+        }
     }
 
 }
