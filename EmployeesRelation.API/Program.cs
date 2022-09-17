@@ -1,5 +1,4 @@
 using EmployeesRelation.API.AuthorizationAndAuthentication;
-using EmployeesRelation.API.Filters;
 using EmployeesRelation.API.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
@@ -23,7 +22,7 @@ namespace EmployeesRelation.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(option =>
             {
-                option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                option.AddSecurityDefinition("Authorization", new OpenApiSecurityScheme
                 {
                     In = ParameterLocation.Header,
                     Description = "Informe o token",
@@ -40,7 +39,7 @@ namespace EmployeesRelation.API
                             Reference = new OpenApiReference
                             {
                                 Type=ReferenceType.SecurityScheme,
-                                Id="Bearer"
+                                Id="Authorization"
                             }
                         },
                         new string[]{}

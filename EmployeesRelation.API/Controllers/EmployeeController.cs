@@ -5,12 +5,12 @@ using EmployeesRelation.API.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
-using System.Security.Claims;
 
 namespace EmployeesRelation.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class EmployeeController : ControllerBase
     {
         private readonly IConfiguration _configuration;
@@ -25,7 +25,6 @@ namespace EmployeesRelation.API.Controllers
         [HttpGet]
         [Authorize]
         [ProducesResponseType(typeof(Employee), 200)]
-        [ProducesResponseType(204)]
         public IActionResult Get([FromQuery] int page, [FromQuery] int maxResults)
         {
 
