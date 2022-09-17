@@ -22,9 +22,16 @@
   },
   {
     "Id": 4,
-    "Name": "Juliano Le\u00E3o",
+    "Name": "Juliano Leao",
     "UserName": "JL",
     "Password": "senhasecreta567",
     "Role": "Junior"
+  },
+  {
+    "Id": 5,
+    "Name": "Pietro Silva",
+    "UserName": "PSILVA",
+    "Password": "SENHA",
+    "Role": "HR"
   }
 ]

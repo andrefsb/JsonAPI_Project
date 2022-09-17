@@ -46,9 +46,16 @@ namespace EmployeesRelation.API.Controllers
 
         [HttpPost("create")]
         [Authorize(Roles ="Manager")]
+        [ProducesResponseType(typeof(Users), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(Users), StatusCodes.Status409Conflict)]
         public IActionResult InsertUser([FromBody] UsersDto usersDto)
         {
             List<Users> list = JsonOperations.ReadUsers();
+            if (list.Contains(list.FirstOrDefault(item => item.UserName.Equals(usersDto.UserName))))
+            {
+                return Conflict($"Username {usersDto.UserName} already taken.");
+            }
+
             var newUser = new Users();
             var lastId = list.OrderBy(x => x.Id).Last().Id + 1;
             newUser.Id = lastId;

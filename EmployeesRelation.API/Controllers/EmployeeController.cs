@@ -5,6 +5,7 @@ using EmployeesRelation.API.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
+using System.Security.Claims;
 
 namespace EmployeesRelation.API.Controllers
 {
@@ -81,8 +82,7 @@ namespace EmployeesRelation.API.Controllers
                 Salary = request.Salary,
 
             };
-            //_logger.Before = employee.ToString();
-            //_logger.After = null;
+
             JsonOperations._database.Add(employee);
             JsonOperations.SaveEmployees();
             return Created(string.Empty, employee);
@@ -168,6 +168,7 @@ namespace EmployeesRelation.API.Controllers
             _logger.EmployeeId = id;
             _logger.Before = found.ToString();
             _logger.After = inserted.ToString();
+            _logger.LoggedUserName = User.Identity.Name;
             JsonOperations.SaveEmployees();
             return Ok(inserted);
         }
@@ -205,6 +206,7 @@ namespace EmployeesRelation.API.Controllers
             _logger.EmployeeId = id;
             _logger.Before = found.ToString();
             _logger.After = inserted.ToString();
+            _logger.LoggedUserName = User.Identity.Name;
             return Ok(inserted);
         }
 
@@ -228,6 +230,7 @@ namespace EmployeesRelation.API.Controllers
                 _logger.EmployeeId = result.Id;
                 _logger.Before = result.ToString();
                 _logger.After = null;
+                _logger.LoggedUserName = User.Identity.Name;
                 JsonOperations._database.Remove(result);
                 JsonOperations.SaveEmployees();
                 return Ok(result);

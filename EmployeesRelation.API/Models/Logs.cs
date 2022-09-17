@@ -2,6 +2,7 @@
 {
     public class Logs
     {
+        public string LoggedUserName { get; set; }
         public string EmployeeName { get; set; }
         public int EmployeeId { get; set; }
         public DateTime Date { get; set; }

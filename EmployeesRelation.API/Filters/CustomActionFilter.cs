@@ -34,6 +34,7 @@ namespace EmployeesRelation.API.Filters
         {
             log = context.HttpContext.RequestServices.GetService<Logs>();
             log.Date  = DateTime.Now;
+            
         }
     }
 }
