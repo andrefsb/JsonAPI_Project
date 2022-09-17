@@ -20,6 +20,8 @@ namespace EmployeesRelation.API.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Manager")]
+        [ProducesResponseType(typeof(Users), 200)]
+        [ProducesResponseType(204)]
         public IActionResult Get([FromQuery] int page, [FromQuery] int maxResults)
         {
             List<Users> list = JsonOperations.ReadUsers();
@@ -31,7 +33,10 @@ namespace EmployeesRelation.API.Controllers
         }
 
         [HttpPost]
-        
+        [ProducesResponseType(typeof(Users), 200)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(Users), StatusCodes.Status404NotFound)]
+
         public IActionResult GetUserByUserPass([FromBody] UsersDto usersDto)
         {
             List<Users> list = JsonOperations.ReadUsers();
@@ -71,6 +76,9 @@ namespace EmployeesRelation.API.Controllers
 
         [HttpPost]
         [Route("login")]
+        [ProducesResponseType(typeof(Users), 200)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(Users), StatusCodes.Status404NotFound)]
         public IActionResult Login([FromBody] Authenticate authInfo)
         {
             List<Users> list = JsonOperations.ReadUsers();
