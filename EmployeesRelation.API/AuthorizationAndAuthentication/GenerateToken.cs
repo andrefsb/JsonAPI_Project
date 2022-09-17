@@ -22,7 +22,7 @@ namespace EmployeesRelation.API.AuthorizationAndAuthentication
 
             var nameClaim = new Claim(ClaimTypes.Name, user.UserName);
             var roleClaim = new Claim(ClaimTypes.Role, user.Role);
-            var subjectClaim = new Claim(ClaimValueTypes.String, _tokenConfiguration.Subject);
+            var subjectClaim = new Claim(JwtRegisteredClaimNames.Sub, _tokenConfiguration.Subject);
             var moduleClaim = new Claim(ClaimValueTypes.String, _tokenConfiguration.Module);
             List<Claim> claims = new List<Claim>();
             claims.Add(nameClaim);
@@ -35,7 +35,7 @@ namespace EmployeesRelation.API.AuthorizationAndAuthentication
                 audience: _tokenConfiguration.Audience,
                 claims: claims,
                 expires: DateTime.Now.AddHours(_tokenConfiguration.ExpirationTimeInHours),
-                signingCredentials: new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature)
+                signingCredentials: new SigningCredentials(securityKey, "HS256")
                 );
             return tokenHandler.WriteToken(jwtToken);
         }

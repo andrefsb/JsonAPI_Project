@@ -20,8 +20,7 @@ namespace EmployeesRelation.API.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Manager")]
-        [ProducesResponseType(typeof(Users), 200)]
-        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(Users), StatusCodes.Status200OK)]
         public IActionResult Get([FromQuery] int page, [FromQuery] int maxResults)
         {
             List<Users> list = JsonOperations.ReadUsers();
@@ -33,9 +32,8 @@ namespace EmployeesRelation.API.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(Users), 200)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(typeof(Users), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(Users), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
 
         public IActionResult GetUserByUserPass([FromBody] UsersDto usersDto)
         {
@@ -44,7 +42,7 @@ namespace EmployeesRelation.API.Controllers
 
             if (user is null)
             {
-                return NotFound();
+                return NotFound("User not found.");
             }
             return Created("",user);
         }
@@ -52,7 +50,7 @@ namespace EmployeesRelation.API.Controllers
         [HttpPost("create")]
         [Authorize(Roles ="Manager")]
         [ProducesResponseType(typeof(Users), StatusCodes.Status201Created)]
-        [ProducesResponseType(typeof(Users), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
         public IActionResult InsertUser([FromBody] UsersDto usersDto)
         {
             List<Users> list = JsonOperations.ReadUsers();
@@ -70,15 +68,14 @@ namespace EmployeesRelation.API.Controllers
             newUser.Role = usersDto.Role;
             list.Add(newUser);
             JsonOperations.SaveUsers(list);
-            return Ok(newUser);
+            return Created("Sucsess!",newUser);
         }
 
 
         [HttpPost]
         [Route("login")]
-        [ProducesResponseType(typeof(Users), 200)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(typeof(Users), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(Users), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public IActionResult Login([FromBody] Authenticate authInfo)
         {
             List<Users> list = JsonOperations.ReadUsers();

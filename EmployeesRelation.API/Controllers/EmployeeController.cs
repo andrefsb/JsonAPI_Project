@@ -46,8 +46,7 @@ namespace EmployeesRelation.API.Controllers
         [HttpGet("{id}")]
         [Authorize]
         [ProducesResponseType(typeof(Employee), 200)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(typeof(Employee), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public IActionResult Get(int id)
         {
             List<Employee> database = JsonOperations.ReadEmployees();
@@ -55,7 +54,7 @@ namespace EmployeesRelation.API.Controllers
             if (result is null)
             {
 
-                return StatusCode(StatusCodes.Status404NotFound);
+                return NotFound("Employee not found.");
             }
             else
             {
@@ -67,7 +66,6 @@ namespace EmployeesRelation.API.Controllers
         [HttpPost]
         [Authorize(Roles = "Manager,HR,Junior")]
         [ProducesResponseType(typeof(Employee), StatusCodes.Status201Created)]
-        [ProducesResponseType(204)]
         public IActionResult Post([FromBody] CreateEmployee request)
         {
             List<Employee> database = JsonOperations.ReadEmployees();
@@ -90,8 +88,7 @@ namespace EmployeesRelation.API.Controllers
         [HttpPost("request")]
         [Authorize]
         [ProducesResponseType(typeof(Employee), StatusCodes.Status201Created)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(typeof(Employee), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetByFilter([FromQuery] int page, [FromQuery] int maxResults, [FromBody] EmployeeParameters request)
         {
             List<Employee> database = JsonOperations.ReadEmployees();
@@ -104,6 +101,7 @@ namespace EmployeesRelation.API.Controllers
                                    .Skip((page - 1) * maxResults)
                                    .Take(maxResults)
                                    .ToList();
+                return Ok(filteredData);
             }
             else if (request.JobTitle.Equals("string") && !request.Gender.Equals("string"))
             {
@@ -114,6 +112,7 @@ namespace EmployeesRelation.API.Controllers
                                        .Skip((page - 1) * maxResults)
                                        .Take(maxResults)
                                        .ToList();
+                return Ok(filteredData);
             }
             else if (request.JobTitle.Equals("string") && request.Gender.Equals("string"))
             {
@@ -123,6 +122,7 @@ namespace EmployeesRelation.API.Controllers
                                        .Skip((page - 1) * maxResults)
                                        .Take(maxResults)
                                        .ToList();
+                return Ok(filteredData);
             }
             else
             {
@@ -132,8 +132,9 @@ namespace EmployeesRelation.API.Controllers
                                        .Skip((page - 1) * maxResults)
                                        .Take(maxResults)
                                        .ToList();
+                return Ok(filteredData);
             }
-            return Ok(filteredData);
+            return NotFound("Employee not found.");
 
         }
 
@@ -141,16 +142,20 @@ namespace EmployeesRelation.API.Controllers
         [CustomActionFilter()]
         [Authorize(Roles = "Manager,HR")]
         [Consumes(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(Employee), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(Employee), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(Employee), StatusCodes.Status415UnsupportedMediaType)]
-        [ProducesResponseType(typeof(Employee), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
 
         public async Task<IActionResult> Put([FromRoute] int id, [FromBody] CreateEmployee request)
         {
             List<Employee> database = JsonOperations.ReadEmployees();
 
             var found = database.Where(x => x.Id == id).FirstOrDefault();
+
+            if(found is null)
+            {
+                return NotFound("Employee not found.");
+            }
+
             JsonOperations._database.Remove(found);
 
 
@@ -163,6 +168,8 @@ namespace EmployeesRelation.API.Controllers
                 JobTitle = request.JobTitle,
                 Salary = request.Salary,
             };
+
+
             JsonOperations._database.Add(inserted);
             _logger.EmployeeName = (inserted.FirstName.ToString() + " " + inserted.LastName.ToString());
             _logger.EmployeeId = id;
@@ -177,8 +184,7 @@ namespace EmployeesRelation.API.Controllers
         [Authorize(Roles = "Manager,HR")]
         [CustomActionFilter()]
         [ProducesResponseType(typeof(Employee), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(Employee), StatusCodes.Status415UnsupportedMediaType)]
-        [ProducesResponseType(typeof(Employee), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public IActionResult Patch([FromRoute] int id, EmployeeParameters request)
         {
             List<Employee> database = JsonOperations.ReadEmployees();
@@ -187,7 +193,7 @@ namespace EmployeesRelation.API.Controllers
 
             if (found is null)
             {
-                return StatusCode(StatusCodes.Status404NotFound);
+                return NotFound("Employee not found.");
             }
             JsonOperations._database.Remove(found);
 
@@ -213,16 +219,15 @@ namespace EmployeesRelation.API.Controllers
         [HttpDelete("{id}")]
         [Authorize(Roles = "Manager,HR")]
         [CustomActionFilter()]
-        [ProducesResponseType(typeof(Employee), 200)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(typeof(Employee), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(Employee), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public IActionResult Delete(int id)
         {
             List<Employee> database = JsonOperations.ReadEmployees();
             var result = database.Where(x => x.Id == id).FirstOrDefault();
             if (result is null)
             {
-                return StatusCode(StatusCodes.Status404NotFound);
+                return NotFound("Employee not found.");
             }
             else
             {
