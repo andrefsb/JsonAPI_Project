@@ -15,6 +15,11 @@ namespace EmployeesRelation.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddCors(cors => cors.AddPolicy("AllowOriginAndMethod", options => options
+            .WithOrigins(new[] { "localhost" })
+            .AllowAnyMethod()
+            ));
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(option =>
             {
@@ -46,7 +51,6 @@ namespace EmployeesRelation.API
 
 
             builder.Services.AddControllers();
-            ////builder.Services.AddControllers(options => options.Filters.Add(typeof(CustomActionFilter)));
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
@@ -85,7 +89,7 @@ namespace EmployeesRelation.API
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            app.UseCors("AllowOriginAndMethod");
             app.UseHttpsRedirection();
 
             app.UseAuthentication();
