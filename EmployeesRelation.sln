@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32602.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmployeesRelation.API", "EmprestimoLivros.API\EmployeesRelation.API.csproj", "{A64FA437-C49B-499D-9D5E-ABFEA43B2A1F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmployeesRelation.API", "EmployeesRelation.API\EmployeesRelation.API.csproj", "{A64FA437-C49B-499D-9D5E-ABFEA43B2A1F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

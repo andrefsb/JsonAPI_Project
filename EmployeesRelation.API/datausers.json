@@ -1,0 +1,30 @@
+[
+  {
+    "Id": 1,
+    "Name": "Pedro Sampaio",
+    "UserName": "PS",
+    "Password": "pedrosampaiopass",
+    "Role": "Manager"
+  },
+  {
+    "Id": 2,
+    "Name": "Maria Cunha",
+    "UserName": "MC",
+    "Password": "maria123",
+    "Role": "Developer"
+  },
+  {
+    "Id": 3,
+    "Name": "Mariana Martins",
+    "UserName": "MM",
+    "Password": "marimar",
+    "Role": "Guest"
+  },
+  {
+    "Id": 4,
+    "Name": "Juliano Le\u00E3o",
+    "UserName": "JL",
+    "Password": "senhasecreta567",
+    "Role": "Junior"
+  }
+]

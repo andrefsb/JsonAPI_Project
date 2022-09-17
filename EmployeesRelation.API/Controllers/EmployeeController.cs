@@ -2,32 +2,40 @@ using EmployeesRelation.API.Database;
 using EmployeesRelation.API.Dto;
 using EmployeesRelation.API.Filters;
 using EmployeesRelation.API.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
 
 namespace EmployeesRelation.API.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class EmployeeController : ControllerBase
     {
+        private readonly IConfiguration _configuration;
         private readonly Logs _logger;
-        public EmployeeController(Logs logger)
+        public EmployeeController(Logs logger, IConfiguration configuration)
         {
             _logger = logger;
+            _configuration = configuration;
+
         }
 
         [HttpGet]
+        [Authorize]
         [ProducesResponseType(typeof(Employee), 200)]
         [ProducesResponseType(204)]
         public IActionResult Get([FromQuery] int page, [FromQuery] int maxResults)
         {
 
             {
-                List<Employee> database = JsonOperations.Read();
-                var pageData = database.Skip((page - 1) * maxResults)
-                                                        .Take(maxResults)
+                var apikey = _configuration.GetValue<string>("AppInsightsInstrumantationKey");
+                Console.WriteLine(apikey);
+
+                List<Employee> database = JsonOperations.ReadEmployees();
+                var pageData = database.OrderBy(x => x.Id).Skip((page - 1) * maxResults)
                                                         .OrderBy(x => x.Id)
+                                                        .Take(maxResults)
                                                         .ToList();
                 return Ok(pageData);
             }
@@ -35,12 +43,13 @@ namespace EmployeesRelation.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         [ProducesResponseType(typeof(Employee), 200)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(Employee), StatusCodes.Status404NotFound)]
         public IActionResult Get(int id)
         {
-            List<Employee> database = JsonOperations.Read();
+            List<Employee> database = JsonOperations.ReadEmployees();
             var result = database.Where(x => x.Id == id).FirstOrDefault();
             if (result is null)
             {
@@ -55,11 +64,12 @@ namespace EmployeesRelation.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Manager,HR,Junior")]
         [ProducesResponseType(typeof(Employee), StatusCodes.Status201Created)]
         [ProducesResponseType(204)]
         public IActionResult Post([FromBody] CreateEmployee request)
         {
-            List<Employee> database = JsonOperations.Read();
+            List<Employee> database = JsonOperations.ReadEmployees();
             var lastId = database.OrderBy(x => x.Id).Last().Id + 1;
             var employee = new Employee
             {
@@ -74,52 +84,53 @@ namespace EmployeesRelation.API.Controllers
             //_logger.Before = employee.ToString();
             //_logger.After = null;
             JsonOperations._database.Add(employee);
-            JsonOperations.Save();
+            JsonOperations.SaveEmployees();
             return Created(string.Empty, employee);
         }
         [HttpPost("request")]
+        [Authorize]
         [ProducesResponseType(typeof(Employee), StatusCodes.Status201Created)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(Employee), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetByFilter([FromQuery] int page, [FromQuery] int maxResults, [FromBody] EmployeeParameters request)//Passar Body
+        public async Task<IActionResult> GetByFilter([FromQuery] int page, [FromQuery] int maxResults, [FromBody] EmployeeParameters request)
         {
-            List<Employee> database = JsonOperations.Read();
+            List<Employee> database = JsonOperations.ReadEmployees();
             List<Employee> filteredData;
             if (request.Gender.Equals("string") && !request.JobTitle.Equals("string"))
             {
                 filteredData = database
+                                   .OrderBy(x => x.Id)
                                    .Where(x => x.JobTitle.Contains(request.JobTitle) && x.Salary >= request.Salary)
                                    .Skip((page - 1) * maxResults)
                                    .Take(maxResults)
-                                   .OrderBy(x => x.Id)
                                    .ToList();
             }
             else if (request.JobTitle.Equals("string") && !request.Gender.Equals("string"))
             {
 
                 filteredData = database
+                                        .OrderBy(x => x.Id)
                                        .Where(x => x.Gender.ToUpper() == request.Gender.ToUpper() && x.Salary >= request.Salary)
                                        .Skip((page - 1) * maxResults)
                                        .Take(maxResults)
-                                       .OrderBy(x => x.Id)
                                        .ToList();
             }
             else if (request.JobTitle.Equals("string") && request.Gender.Equals("string"))
             {
                 filteredData = database
+                                        .OrderBy(x => x.Id)
                                        .Where(x => x.Salary >= request.Salary)
                                        .Skip((page - 1) * maxResults)
                                        .Take(maxResults)
-                                       .OrderBy(x => x.Id)
                                        .ToList();
             }
             else
             {
                 filteredData = database
+                                        .OrderBy(x => x.Id)
                                        .Where(x => x.JobTitle.Contains(request.JobTitle) && x.Gender.ToUpper() == request.Gender.ToUpper() && x.Salary >= request.Salary)
                                        .Skip((page - 1) * maxResults)
                                        .Take(maxResults)
-                                       .OrderBy(x => x.Id)
                                        .ToList();
             }
             return Ok(filteredData);
@@ -128,6 +139,7 @@ namespace EmployeesRelation.API.Controllers
 
         [HttpPut("{id}")]
         [CustomActionFilter()]
+        [Authorize(Roles = "Manager,HR")]
         [Consumes(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(Employee), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(Employee), StatusCodes.Status200OK)]
@@ -136,7 +148,7 @@ namespace EmployeesRelation.API.Controllers
 
         public async Task<IActionResult> Put([FromRoute] int id, [FromBody] CreateEmployee request)
         {
-            List<Employee> database = JsonOperations.Read();
+            List<Employee> database = JsonOperations.ReadEmployees();
 
             var found = database.Where(x => x.Id == id).FirstOrDefault();
             JsonOperations._database.Remove(found);
@@ -156,18 +168,19 @@ namespace EmployeesRelation.API.Controllers
             _logger.EmployeeId = id;
             _logger.Before = found.ToString();
             _logger.After = inserted.ToString();
-            JsonOperations.Save();
+            JsonOperations.SaveEmployees();
             return Ok(inserted);
         }
 
         [HttpPatch("{id}")]
+        [Authorize(Roles = "Manager,HR")]
         [CustomActionFilter()]
         [ProducesResponseType(typeof(Employee), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Employee), StatusCodes.Status415UnsupportedMediaType)]
         [ProducesResponseType(typeof(Employee), StatusCodes.Status404NotFound)]
         public IActionResult Patch([FromRoute] int id, EmployeeParameters request)
         {
-            List<Employee> database = JsonOperations.Read();
+            List<Employee> database = JsonOperations.ReadEmployees();
 
             var found = database.Where(x => x.Id == id).FirstOrDefault();
 
@@ -187,7 +200,7 @@ namespace EmployeesRelation.API.Controllers
                 Salary = request.Salary,
             };
             JsonOperations._database.Add(inserted);
-            JsonOperations.Save();
+            JsonOperations.SaveEmployees();
             _logger.EmployeeName = (inserted.FirstName.ToString() + " " + inserted.LastName.ToString());
             _logger.EmployeeId = id;
             _logger.Before = found.ToString();
@@ -196,13 +209,14 @@ namespace EmployeesRelation.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Manager,HR")]
         [CustomActionFilter()]
         [ProducesResponseType(typeof(Employee), 200)]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(Employee), StatusCodes.Status404NotFound)]
         public IActionResult Delete(int id)
         {
-            List<Employee> database = JsonOperations.Read();
+            List<Employee> database = JsonOperations.ReadEmployees();
             var result = database.Where(x => x.Id == id).FirstOrDefault();
             if (result is null)
             {
@@ -215,7 +229,7 @@ namespace EmployeesRelation.API.Controllers
                 _logger.Before = result.ToString();
                 _logger.After = null;
                 JsonOperations._database.Remove(result);
-                JsonOperations.Save();
+                JsonOperations.SaveEmployees();
                 return Ok(result);
             }
         }
