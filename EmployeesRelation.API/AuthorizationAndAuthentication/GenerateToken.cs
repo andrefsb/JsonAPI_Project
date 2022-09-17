@@ -22,9 +22,13 @@ namespace EmployeesRelation.API.AuthorizationAndAuthentication
 
             var nameClaim = new Claim(ClaimTypes.Name, user.UserName);
             var roleClaim = new Claim(ClaimTypes.Role, user.Role);
+            var subjectClaim = new Claim(ClaimValueTypes.String, _tokenConfiguration.Subject);
+            var moduleClaim = new Claim(ClaimValueTypes.String, _tokenConfiguration.Module);
             List<Claim> claims = new List<Claim>();
             claims.Add(nameClaim);
             claims.Add(roleClaim);
+            claims.Add(subjectClaim);
+            claims.Add(moduleClaim);
 
             var jwtToken = new JwtSecurityToken(
                 issuer: _tokenConfiguration.Issuer,
