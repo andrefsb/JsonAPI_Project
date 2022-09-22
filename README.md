@@ -16,6 +16,6 @@ Instruções básicas para uso:
 
 5-A consulta de employees com filtros não necessita de utilização de todas as categorias simultaneamente. 
 Aquela cuja interferência não seja desejada, deve-se manter com o default da Body.
-Em consulta referente a salário, pergar-se-á aquele com valor maior ou igual ao informado na Body.
+Em consulta referente a salário, pegar-se-á aquele com valor maior ou igual ao informado na Body.
 
 Boa utilização da aplicação!
